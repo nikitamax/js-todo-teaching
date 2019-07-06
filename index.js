@@ -21,16 +21,17 @@ function createLi(task) {
   var checked = task.completed ? "checked" : "";
   var li = document.createElement("li");
   li.className = className;
+  li.id = task.id;
   var div = document.createElement("div");
   div.className = "view";
   var toggle = document.createElement("input");
   toggle.className = "toggle";
   toggle.type = "checkbox";
   toggle.checked = checked;
+  toggle.onchange = toggleTask;
   var label = document.createElement("label");
   label.innerHTML = task.text;
   var button = document.createElement("button");
-  button.id = task.id;
   button.className = "destroy";
   button.onclick = deleteTask;
   div.appendChild(toggle);
@@ -65,12 +66,23 @@ function getMaxId(tasks) {
 }
 
 function deleteTask(event) {
-  var liId = event.target.id;
+  var li = event.target.parentNode.parentNode;
   tasksList.forEach(function(task) {
-    if (liId === task.id) {
-      tasksList.splice(liId - 1, 1);
+    if (li.id === task.id) {
+      tasksList.splice(+li.id - 1, 1);
     }
   });
-  var li = event.target.parentNode.parentNode;
   ul.removeChild(li);
+}
+
+function toggleTask(event) {
+  var li = event.target.parentNode.parentNode;
+  var checked = event.target.checked;
+  li.className = checked ? "completed" : "";
+  tasksList = tasksList.map(function(task) {
+    if (task.id == li.id) {
+      return { id: task.id, text: task.text, completed: !task.completed };
+    }
+    return task;
+  });
 }
