@@ -8,8 +8,9 @@ var tasksList = [
   { id: "7", text: "generate", completed: true }
 ];
 
+var ul = document.getElementsByClassName("todo-list")[0];
+
 window.onload = function() {
-  var ul = document.getElementsByClassName("todo-list")[0];
   tasksList.forEach(function(task) {
     ul.appendChild(createLi(task));
   });
@@ -31,6 +32,7 @@ function createLi(task) {
   var button = document.createElement("button");
   button.id = task.id;
   button.className = "destroy";
+  button.onclick = deleteTask;
   div.appendChild(toggle);
   div.appendChild(label);
   div.appendChild(button);
@@ -50,7 +52,6 @@ function addNewTask(event) {
     text: event.target.value
   };
   tasksList.push(newTask);
-  var ul = document.getElementsByClassName("todo-list")[0];
   ul.appendChild(createLi(newTask));
   event.target.value = "";
 }
@@ -61,4 +62,15 @@ function getMaxId(tasks) {
     ids = ["0"];
   }
   return Math.max.apply(null, ids);
+}
+
+function deleteTask(event) {
+  var liId = event.target.id;
+  tasksList.forEach(function(task) {
+    if (liId === task.id) {
+      tasksList.splice(liId - 1, 1);
+    }
+  });
+  var li = event.target.parentNode.parentNode;
+  ul.removeChild(li);
 }
