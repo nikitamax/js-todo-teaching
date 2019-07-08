@@ -79,9 +79,9 @@ function getMaxId(tasks) {
 
 function deleteTask(event, element) {
   var li = element ? element : event.target.parentNode.parentNode;
-  tasksList.forEach(function(task) {
+  tasksList.forEach(function(task, i) {
     if (li.id === task.id) {
-      tasksList.splice(+li.id - 1, 1);
+      tasksList.splice(i, 1);
     }
   });
   ul.removeChild(li);
@@ -114,16 +114,16 @@ function startEditTask(event) {
 function endEditTask(event) {
   var li = event.target.parentNode;
   var input = event.target;
+  if (!input.value) {
+    deleteTask(event, li);
+    return;
+  }
   tasksList = tasksList.map(function(task) {
     if (task.id === li.id) {
       return { ...task, text: input.value };
     }
     return task;
   });
-  if (!input.value) {
-    deleteTask(event, li);
-  }
-  countActiveTasks();
   var label = li.children[0].children[1];
   label.innerHTML = input.value;
   li.className = li.className === "editing" ? "" : "completed";
