@@ -31,6 +31,7 @@ function createLi(task) {
   toggle.onchange = toggleTask;
   var label = document.createElement("label");
   label.innerHTML = task.text;
+  label.ondblclick = startEditTask;
   var button = document.createElement("button");
   button.className = "destroy";
   button.onclick = deleteTask;
@@ -39,7 +40,8 @@ function createLi(task) {
   div.appendChild(button);
   var input = document.createElement("input");
   input.className = "edit";
-  input.innerHTML = task.text;
+  input.value = task.text;
+  input.onchange = endEditTask;
   li.appendChild(div);
   li.appendChild(input);
 
@@ -65,8 +67,8 @@ function getMaxId(tasks) {
   return Math.max.apply(null, ids);
 }
 
-function deleteTask(event) {
-  var li = event.target.parentNode.parentNode;
+function deleteTask(event, element) {
+  var li = element ? element : event.target.parentNode.parentNode;
   tasksList.forEach(function(task) {
     if (li.id === task.id) {
       tasksList.splice(+li.id - 1, 1);
@@ -85,4 +87,27 @@ function toggleTask(event) {
     }
     return task;
   });
+}
+
+function startEditTask(event) {
+  var li = event.target.parentNode.parentNode;
+  li.className = li.className ? li.className + " editing" : "editing";
+  li.children[1].focus();
+}
+
+function endEditTask(event) {
+  var li = event.target.parentNode;
+  var input = event.target;
+  tasksList = tasksList.map(function(task) {
+    if (task.id === li.id) {
+      return { ...task, text: input.value };
+    }
+    return task;
+  });
+  if (!input.value) {
+    deleteTask(event, li);
+  }
+  var label = li.children[0].children[1];
+  label.innerHTML = input.value;
+  li.className = li.className === "editing" ? "" : "completed";
 }
