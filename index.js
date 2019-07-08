@@ -41,7 +41,8 @@ function createLi(task) {
   var input = document.createElement("input");
   input.className = "edit";
   input.value = task.text;
-  input.onchange = endEditTask;
+  input.onblur = endEditTask;
+  input.onkeypress = endEditTaskByEnterClick;
   li.appendChild(div);
   li.appendChild(input);
 
@@ -49,14 +50,16 @@ function createLi(task) {
 }
 
 function addNewTask(event) {
-  var newTask = {
-    id: getMaxId(tasksList) + 1 + "",
-    completed: false,
-    text: event.target.value
-  };
-  tasksList.push(newTask);
-  ul.appendChild(createLi(newTask));
-  event.target.value = "";
+  if (event.key === "Enter") {
+    var newTask = {
+      id: getMaxId(tasksList) + 1 + "",
+      completed: false,
+      text: event.target.value
+    };
+    tasksList.push(newTask);
+    ul.appendChild(createLi(newTask));
+    event.target.value = "";
+  }
 }
 
 function getMaxId(tasks) {
@@ -110,4 +113,12 @@ function endEditTask(event) {
   var label = li.children[0].children[1];
   label.innerHTML = input.value;
   li.className = li.className === "editing" ? "" : "completed";
+}
+
+function endEditTaskByEnterClick(event) {
+  var input = event.target;
+  if (event.key === "Enter") {
+    input.onblur = null;
+    endEditTask(event);
+  }
 }
