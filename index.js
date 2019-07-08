@@ -9,11 +9,13 @@ var tasksList = [
 ];
 
 var ul = document.getElementsByClassName("todo-list")[0];
+var itemsLeft = document.getElementsByTagName("strong")[0];
 
 window.onload = function() {
   tasksList.forEach(function(task) {
     ul.appendChild(createLi(task));
   });
+  countActiveTasks();
 };
 
 function createLi(task) {
@@ -49,6 +51,8 @@ function createLi(task) {
   return li;
 }
 
+// add new task
+
 function addNewTask(event) {
   if (event.key === "Enter") {
     var newTask = {
@@ -59,6 +63,7 @@ function addNewTask(event) {
     tasksList.push(newTask);
     ul.appendChild(createLi(newTask));
     event.target.value = "";
+    countActiveTasks();
   }
 }
 
@@ -70,6 +75,8 @@ function getMaxId(tasks) {
   return Math.max.apply(null, ids);
 }
 
+// delete task
+
 function deleteTask(event, element) {
   var li = element ? element : event.target.parentNode.parentNode;
   tasksList.forEach(function(task) {
@@ -78,7 +85,10 @@ function deleteTask(event, element) {
     }
   });
   ul.removeChild(li);
+  countActiveTasks();
 }
+
+// toggle task
 
 function toggleTask(event) {
   var li = event.target.parentNode.parentNode;
@@ -90,7 +100,10 @@ function toggleTask(event) {
     }
     return task;
   });
+  countActiveTasks();
 }
+
+// editing task
 
 function startEditTask(event) {
   var li = event.target.parentNode.parentNode;
@@ -110,6 +123,7 @@ function endEditTask(event) {
   if (!input.value) {
     deleteTask(event, li);
   }
+  countActiveTasks();
   var label = li.children[0].children[1];
   label.innerHTML = input.value;
   li.className = li.className === "editing" ? "" : "completed";
@@ -121,4 +135,13 @@ function endEditTaskByEnterClick(event) {
     input.onblur = null;
     endEditTask(event);
   }
+}
+
+// footer
+
+function countActiveTasks() {
+  var aciveTasks = tasksList.filter(function(task) {
+    if (!task.completed) return task;
+  });
+  itemsLeft.innerHTML = aciveTasks.length;
 }
