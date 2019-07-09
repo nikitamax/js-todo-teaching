@@ -145,3 +145,42 @@ function countActiveTasks() {
   });
   itemsLeft.innerHTML = aciveTasks.length;
 }
+
+function filterChange(event) {
+  var currentFilter = event.target;
+  var filters = document.getElementsByTagName("a");
+  for (var i = 0; i < filters.length; i++) {
+    if (filters[i].innerHTML !== currentFilter.innerHTML)
+      filters[i].className = "";
+  }
+  currentFilter.className = "selected";
+  switch (currentFilter.innerHTML) {
+    case "Active": {
+      var activeTasks = tasksList.filter(function(task) {
+        if (!task.completed) return task;
+      });
+      ul.innerHTML = "";
+      activeTasks.forEach(function(task) {
+        ul.appendChild(createLi(task));
+      });
+      break;
+    }
+    case "All": {
+      ul.innerHTML = "";
+      tasksList.forEach(function(task) {
+        ul.appendChild(createLi(task));
+      });
+      break;
+    }
+    case "Completed": {
+      var activeTasks = tasksList.filter(function(task) {
+        if (task.completed) return task;
+      });
+      ul.innerHTML = "";
+      activeTasks.forEach(function(task) {
+        ul.appendChild(createLi(task));
+      });
+      break;
+    }
+  }
+}
