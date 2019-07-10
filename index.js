@@ -12,11 +12,15 @@ var ul = document.getElementsByClassName("todo-list")[0];
 var itemsLeft = document.getElementsByTagName("strong")[0];
 
 window.onload = function() {
+  renderTasks();
+  countActiveTasks();
+};
+
+function renderTasks() {
   tasksList.forEach(function(task) {
     ul.appendChild(createLi(task));
   });
-  countActiveTasks();
-};
+}
 
 function createLi(task) {
   var className = task.completed ? "completed" : "";
@@ -183,4 +187,12 @@ function filterChange(event) {
       break;
     }
   }
+}
+
+function clearCompleted() {
+  tasksList = tasksList.filter(function(task) {
+    if (!task.completed) return task;
+  });
+  ul.innerHTML = "";
+  renderTasks();
 }
