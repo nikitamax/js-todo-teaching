@@ -11,10 +11,12 @@ var tasksList = [
 var ul = document.getElementsByClassName("todo-list")[0];
 var itemsLeft = document.getElementsByTagName("strong")[0];
 var footer = document.getElementsByTagName("footer")[0];
+var toggleAllInput = document.getElementsByClassName("toggle-all")[0];
+var toggleAllLable = document.getElementById("toggle-all");
 
 window.onload = function() {
   renderTasks();
-  countActiveTasks();
+  renderCountActiveTasks();
   checkFooter();
 };
 
@@ -22,6 +24,10 @@ function renderTasks() {
   tasksList.forEach(function(task) {
     ul.appendChild(createLi(task));
   });
+}
+
+function clearTasks() {
+  ul.innerHTML = "";
 }
 
 function createLi(task) {
@@ -69,7 +75,7 @@ function addNewTask(event) {
     tasksList.push(newTask);
     ul.appendChild(createLi(newTask));
     event.target.value = "";
-    countActiveTasks();
+    renderCountActiveTasks();
     checkFooter();
   }
 }
@@ -92,7 +98,7 @@ function deleteTask(event, element) {
     }
   });
   ul.removeChild(li);
-  countActiveTasks();
+  renderCountActiveTasks();
   checkFooter();
 }
 
@@ -108,7 +114,12 @@ function toggleTask(event) {
     }
     return task;
   });
-  countActiveTasks();
+  if (countActiveTasks() === 0) {
+    toggleAllInput.checked = true;
+  } else if (countActiveTasks() === tasksList.length) {
+    toggleAllInput.checked = false;
+  }
+  renderCountActiveTasks();
 }
 
 // editing task
@@ -151,7 +162,11 @@ function countActiveTasks() {
   var aciveTasks = tasksList.filter(function(task) {
     if (!task.completed) return task;
   });
-  itemsLeft.innerHTML = aciveTasks.length;
+  return aciveTasks.length;
+}
+
+function renderCountActiveTasks() {
+  itemsLeft.innerHTML = countActiveTasks();
 }
 
 function filterChange(event) {
@@ -167,14 +182,14 @@ function filterChange(event) {
       var activeTasks = tasksList.filter(function(task) {
         if (!task.completed) return task;
       });
-      ul.innerHTML = "";
+      clearTasks();
       activeTasks.forEach(function(task) {
         ul.appendChild(createLi(task));
       });
       break;
     }
     case "All": {
-      ul.innerHTML = "";
+      clearTasks();
       tasksList.forEach(function(task) {
         ul.appendChild(createLi(task));
       });
@@ -184,7 +199,7 @@ function filterChange(event) {
       var activeTasks = tasksList.filter(function(task) {
         if (task.completed) return task;
       });
-      ul.innerHTML = "";
+      clearTasks();
       activeTasks.forEach(function(task) {
         ul.appendChild(createLi(task));
       });
@@ -197,7 +212,7 @@ function clearCompleted() {
   tasksList = tasksList.filter(function(task) {
     if (!task.completed) return task;
   });
-  ul.innerHTML = "";
+  clearTasks();
   renderTasks();
   checkFooter();
 }
@@ -205,5 +220,22 @@ function clearCompleted() {
 function checkFooter() {
   if (!tasksList.length) {
     footer.style.display = "none";
-  } else footer.style.display = "";
+    toggleAllLable.style.display = "none";
+    toggleAllInput.checked = false;
+  } else {
+    footer.style.display = "";
+    toggleAllLable.style.display = "";
+  }
+}
+
+// all check
+
+function toggleAllCheck() {
+  toggleAllInput.checked = toggleAllInput.checked ? false : true;
+  tasksList = tasksList.map(function(task) {
+    return { id: task.id, text: task.text, completed: toggleAllInput.checked };
+  });
+  clearTasks();
+  renderTasks();
+  renderCountActiveTasks();
 }
