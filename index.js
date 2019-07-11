@@ -13,14 +13,16 @@ var itemsLeft = document.getElementsByTagName("strong")[0];
 var footer = document.getElementsByTagName("footer")[0];
 var toggleAllInput = document.getElementsByClassName("toggle-all")[0];
 var toggleAllLable = document.getElementById("toggle-all");
+var filters = document.getElementsByTagName("a");
 
 window.onload = function() {
-  renderTasks();
+  renderTasks(tasksList);
   renderCountActiveTasks();
   checkFooter();
 };
 
-function renderTasks() {
+function renderTasks(tasksList) {
+  clearTasks();
   tasksList.forEach(function(task) {
     ul.appendChild(createLi(task));
   });
@@ -171,7 +173,6 @@ function renderCountActiveTasks() {
 
 function filterChange(event) {
   var currentFilter = event.target;
-  var filters = document.getElementsByTagName("a");
   for (var i = 0; i < filters.length; i++) {
     if (filters[i].innerHTML !== currentFilter.innerHTML)
       filters[i].className = "";
@@ -182,29 +183,26 @@ function filterChange(event) {
       var activeTasks = tasksList.filter(function(task) {
         if (!task.completed) return task;
       });
-      clearTasks();
-      activeTasks.forEach(function(task) {
-        ul.appendChild(createLi(task));
-      });
+      renderTasks(activeTasks);
       break;
     }
     case "All": {
-      clearTasks();
-      tasksList.forEach(function(task) {
-        ul.appendChild(createLi(task));
-      });
+      renderTasks(tasksList);
       break;
     }
     case "Completed": {
-      var activeTasks = tasksList.filter(function(task) {
+      var completedTasks = tasksList.filter(function(task) {
         if (task.completed) return task;
       });
-      clearTasks();
-      activeTasks.forEach(function(task) {
-        ul.appendChild(createLi(task));
-      });
+      renderTasks(completedTasks);
       break;
     }
+  }
+}
+
+function getCurrentFilter() {
+  for (var i = 0; i < filters.length; i++) {
+    if (filters[i].className === "selected") return filters[i].innerHTML;
   }
 }
 
@@ -212,8 +210,7 @@ function clearCompleted() {
   tasksList = tasksList.filter(function(task) {
     if (!task.completed) return task;
   });
-  clearTasks();
-  renderTasks();
+  renderTasks(tasksList);
   checkFooter();
 }
 
@@ -235,7 +232,12 @@ function toggleAllCheck() {
   tasksList = tasksList.map(function(task) {
     return { id: task.id, text: task.text, completed: toggleAllInput.checked };
   });
-  clearTasks();
-  renderTasks();
+  renderTasks(tasksList);
+  if (getCurrentFilter() === "Active" && toggleAllInput.checked) {
+    clearTasks();
+  } else if (getCurrentFilter() === "Completed" && !toggleAllInput.checked) {
+    clearTasks();
+  }
   renderCountActiveTasks();
+  console.log(getCurrentFilter());
 }
