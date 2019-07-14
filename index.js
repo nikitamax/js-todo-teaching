@@ -12,6 +12,7 @@ window.onload = function() {
   renderTasks(tasksList);
   renderCountActiveTasks();
   checkFooter();
+  setFilter();
 };
 
 function updateLocalStorage() {
@@ -224,6 +225,41 @@ function checkFooter() {
   } else {
     footer.style.display = "";
     toggleAllLable.style.display = "";
+  }
+}
+
+function selectFilter(filter) {
+  var el;
+  for (var i = 0; i < filters.length; i++) {
+    filters[i].className = "";
+    if (filters[i].innerHTML.toLowerCase() === filter) {
+      el = filters[i];
+    }
+  }
+  el.className = "selected";
+}
+
+function setFilter() {
+  if (tasksList.length) {
+    var filter = window.location.hash.slice(2);
+    switch (filter) {
+      case "active": {
+        selectFilter(filter);
+        var activeTasks = tasksList.filter(function(task) {
+          if (!task.completed) return task;
+        });
+        renderTasks(activeTasks);
+        break;
+      }
+      case "completed": {
+        selectFilter(filter);
+        var completedTasks = tasksList.filter(function(task) {
+          if (task.completed) return task;
+        });
+        renderTasks(completedTasks);
+        break;
+      }
+    }
   }
 }
 
