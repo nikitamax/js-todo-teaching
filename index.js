@@ -1,12 +1,5 @@
-var tasksList = [
-  { id: "1", text: "synthesize", completed: true },
-  { id: "2", text: "override", completed: false },
-  { id: "3", text: "index", completed: true },
-  { id: "4", text: "compress", completed: false },
-  { id: "5", text: "compress", completed: false },
-  { id: "6", text: "override", completed: true },
-  { id: "7", text: "generate", completed: true }
-];
+var localStorageTasks = JSON.parse(localStorage.tasks);
+var tasksList = localStorageTasks ? localStorageTasks : [];
 
 var ul = document.getElementsByClassName("todo-list")[0];
 var itemsLeft = document.getElementsByTagName("strong")[0];
@@ -20,6 +13,11 @@ window.onload = function() {
   renderCountActiveTasks();
   checkFooter();
 };
+
+function updateLocalStorage() {
+  let serialTasks = JSON.stringify(tasksList);
+  localStorage.setItem("tasks", serialTasks);
+}
 
 function renderTasks(tasksList) {
   clearTasks();
@@ -77,6 +75,7 @@ function addNewTask(event) {
     tasksList.push(newTask);
     ul.appendChild(createLi(newTask));
     event.target.value = "";
+    updateLocalStorage();
     renderCountActiveTasks();
     checkFooter();
   }
@@ -100,6 +99,7 @@ function deleteTask(event, element) {
     }
   });
   ul.removeChild(li);
+  updateLocalStorage();
   renderCountActiveTasks();
   checkFooter();
 }
@@ -121,6 +121,7 @@ function toggleTask(event) {
   } else if (countActiveTasks() === tasksList.length) {
     toggleAllInput.checked = false;
   }
+  updateLocalStorage();
   renderCountActiveTasks();
 }
 
@@ -211,6 +212,7 @@ function clearCompleted() {
     if (!task.completed) return task;
   });
   renderTasks(tasksList);
+  updateLocalStorage();
   checkFooter();
 }
 
@@ -239,5 +241,4 @@ function toggleAllCheck() {
     clearTasks();
   }
   renderCountActiveTasks();
-  console.log(getCurrentFilter());
 }
